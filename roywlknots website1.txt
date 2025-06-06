@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>𝓡𝓸𝔂𝓪𝓵 𝓚𝓷𝓸𝓽𝓼</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #00ff00;
+            --secondary: #00f7ff;
+            --accent: #ff00ff;
+            --dark: #111;
+            --darker: #0a0a0a;
+            --light: #e0e0e0;
+            --glow: 0 0 10px var(--primary), 0 0 20px var(--primary);
+            --secondary-glow: 0 0 10px var(--secondary), 0 0 20px var(--secondary);
+            --accent-glow: 0 0 10px var(--accent), 0 0 20px var(--accent);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* Special class for Naira symbols */
+        .naira-symbol {
+            font-family: 'Roboto', sans-serif;
+        }
+
+        body {
+            background-color: var(--dark);
+            color: var(--light);
+            overflow-x: hidden;
+            line-height: 1.6;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 255, 0, 0.05) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(0, 247, 255, 0.05) 0%, transparent 20%);
+        }
+
+        /* Matrix rain background */
+        .matrix-rain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.15;
+        }
+
+        /* Header styles */
+        header {
+            background-color: rgba(17, 17, 17, 0.95);
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--primary);
+            box-shadow: var(--glow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(5px);
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: var(--primary);
+            text-shadow: var(--glow);
+            letter-spacing: 3px;
+            position: relative;
+        }
+
+        .logo::after {
+            content: "_";
+            animation: blink 1s infinite;
+            color: var(--primary);
+        }
+
+        .cart-icon {
+            position: relative;
+            font-size: 1.8rem;
+            color: var(--primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .cart-icon:hover {
+            transform: scale(1.1);
+            text-shadow: var(--glow);
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background-color: var(--accent);
+            color: var(--dark);
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.9rem;
+            font-weight: bold;
+            box-shadow: var(--accent-glow);
+        }
+
+        /* Main content */
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 3rem 2rem;
+            border: 1px solid var(--primary);
+            box-shadow: var(--glow);
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, rgba(17, 17, 17, 0.8), rgba(10, 10, 10, 0.9));
+        }
+
+        .hero::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to bottom right,
+                transparent 45%,
+                rgba(0, 255, 0, 0.1) 50%,
+                transparent 55%
+            );
+            transform: rotate(30deg);
+            animation: scan 6s linear infinite;
+            pointer-events: none;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+            text-shadow: var(--glow);
+            letter-spacing: 2px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .hero h1::after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            box-shadow: var(--glow);
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            max-width: 800px;
+            margin: 0 auto;
+            color: var(--light);
+            text-shadow: 0 0 5px rgba(224, 224, 224, 0.5);
+        }
+
+        .section-title {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            color: var(--secondary);
+            text-shadow: var(--secondary-glow);
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .section-title::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--secondary), transparent);
+            box-shadow: var(--secondary-glow);
+        }
+
+        /* Products grid */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .product-card {
+            background-color: var(--darker);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            border-radius: 5px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--glow);
+            border-color: var(--primary);
+        }
+
+        .product-card:active {
+            transform: translateY(-5px);
+        }
+
+        .product-image-container {
+            position: relative;
+            overflow: hidden;
+            height: 220px;
+        }
+
+        .product-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .product-card:hover .product-image {
+            transform: scale(1.05);
+        }
+
+        .product-info {
+            padding: 1.5rem;
+        }
+
+        .product-title {
+            font-size: 1.3rem;
+            margin-bottom: 0.8rem;
+            color: var(--primary);
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .product-description {
+            font-size: 0.95rem;
+            margin-bottom: 1.2rem;
+            color: #bbb;
+            line-height: 1.6;
+        }
+
+        .product-price {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: var(--secondary);
+            margin-bottom: 1.2rem;
+            text-shadow: 0 0 8px var(--secondary);
+            display: flex;
+            align-items: center;
+        }
+
+        .product-price::before {
+            content: "₦";
+            margin-right: 3px;
+            font-size: 1.2rem;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .product-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .quantity-btn {
+            background-color: var(--dark);
+            color: var(--primary);
+            border: 1px solid var(--primary);
+            width: 32px;
+            height: 32px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+
+        .quantity-btn:hover {
+            background-color: rgba(0, 255, 0, 0.1);
+            box-shadow: 0 0 8px var(--primary);
+        }
+
+        .quantity {
+            width: 45px;
+            text-align: center;
+            background-color: transparent;
+            color: var(--light);
+            border: 1px solid var(--primary);
+            border-radius: 3px;
+            padding: 0.4rem;
+            font-weight: bold;
+        }
+
+        .add-to-cart {
+            background-color: rgba(0, 255, 0, 0.1);
+            color: var(--primary);
+            border: 1px solid var(--primary);
+            padding: 0.6rem 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 3px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.85rem;
+        }
+
+        .add-to-cart:hover {
+            background-color: rgba(0, 255, 0, 0.3);
+            box-shadow: var(--glow);
+        }
+
+        .add-to-cart:active {
+            transform: scale(0.95);
+        }
+
+        /* Cart modal */
+        .cart-modal {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 100%;
+            max-width: 450px;
+            height: 100vh;
+            background-color: var(--darker);
+            border-left: 1px solid var(--primary);
+            box-shadow: -5px 0 30px rgba(0, 255, 0, 0.3);
+            transition: right 0.4s ease;
+            z-index: 1000;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cart-modal.open {
+            right: 0;
+        }
+
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.8rem;
+            border-bottom: 1px solid rgba(0, 255, 0, 0.3);
+            background: rgba(10, 10, 10, 0.9);
+        }
+
+        .cart-title {
+            font-size: 1.8rem;
+            color: var(--primary);
+            text-shadow: var(--glow);
+            letter-spacing: 1px;
+        }
+
+        .close-cart {
+            background: none;
+            border: none;
+            color: var(--primary);
+            font-size: 2rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+        }
+
+        .close-cart:hover {
+            transform: rotate(90deg);
+            text-shadow: var(--glow);
+            background: rgba(0, 255, 0, 0.1);
+        }
+
+        .cart-items {
+            padding: 1.5rem;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .cart-item {
+            display: flex;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px dashed rgba(0, 255, 0, 0.2);
+        }
+
+        .cart-item-image {
+            width: 90px;
+            height: 90px;
+            object-fit: cover;
+            margin-right: 1.2rem;
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            border-radius: 3px;
+        }
+
+        .cart-item-details {
+            flex: 1;
+        }
+
+        .cart-item-title {
+            font-size: 1.1rem;
+            margin-bottom: 0.6rem;
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .cart-item-price {
+            font-size: 1rem;
+            color: var(--secondary);
+            margin-bottom: 0.6rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .cart-item-price::before {
+            content: "₦";
+            margin-right: 3px;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .cart-item-quantity {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .cart-item-quantity span {
+            font-size: 0.9rem;
+            color: #bbb;
+        }
+
+        .remove-item {
+            background: none;
+            border: none;
+            color: #ff5555;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s ease;
+        }
+
+        .remove-item i {
+            font-size: 0.8rem;
+        }
+
+        .remove-item:hover {
+            color: #ff0000;
+            text-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
+        }
+
+        .cart-footer {
+            background: rgba(10, 10, 10, 0.9);
+            padding: 1.5rem;
+            border-top: 1px solid rgba(0, 255, 0, 0.3);
+        }
+
+        .cart-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.3rem;
+        }
+
+        .total-label {
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .total-amount {
+            color: var(--secondary);
+            font-weight: bold;
+            text-shadow: 0 0 8px var(--secondary);
+            display: flex;
+            align-items: center;
+        }
+
+        .total-amount::before {
+            content: "₦";
+            margin-right: 3px;
+            font-size: 1.1rem;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .checkout-btn {
+            display: block;
+            width: 100%;
+            padding: 1rem;
+            background-color: rgba(0, 255, 0, 0.1);
+            color: var(--primary);
+            border: 1px solid var(--primary);
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 3px;
+            text-align: center;
+        }
+
+        .checkout-btn:hover {
+            background-color: rgba(0, 255, 0, 0.3);
+            box-shadow: var(--glow);
+            letter-spacing: 2px;
+        }
+
+        .checkout-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Overlay */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            backdrop-filter: blur(3px);
+        }
+
+        .overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        /* Animations */
+        @keyframes flicker {
+            0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+                text-shadow: var(--glow);
+                opacity: 1;
+            }
+            20%, 24%, 55% {
+                text-shadow: none;
+                opacity: 0.7;
+            }
+        }
+
+        @keyframes blink {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0;
+            }
+        }
+
+        @keyframes scan {
+            0% {
+                transform: rotate(30deg) translateY(-100%);
+            }
+            100% {
+                transform: rotate(30deg) translateY(100%);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 0.8;
+            }
+            50% {
+                opacity: 0.3;
+            }
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        /* Terminal effect for empty cart */
+        .empty-cart {
+            padding: 3rem 2rem;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+            position: relative;
+            color: var(--primary);
+            border: 1px dashed rgba(0, 255, 0, 0.3);
+            border-radius: 5px;
+            margin-top: 2rem;
+        }
+
+        .empty-cart::before {
+            content: ">";
+            position: absolute;
+            left: 1rem;
+            top: 3rem;
+            color: var(--primary);
+            animation: pulse 1.5s infinite;
+        }
+
+        /* Hacker effect for product titles */
+        .hacker-text {
+            position: relative;
+            display: inline-block;
+        }
+
+        .hacker-text::after {
+            content: attr(data-text);
+            position: absolute;
+            left: 0;
+            top: 0;
+            color: var(--primary);
+            width: 0;
+            overflow: hidden;
+            white-space: nowrap;
+            animation: typing 3s steps(30, end) forwards;
+            text-shadow: var(--glow);
+        }
+
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+
+        /* Binary decoration */
+        .binary-decoration {
+            position: absolute;
+            color: rgba(0, 255, 0, 0.1);
+            font-size: 0.9rem;
+            user-select: none;
+            z-index: -1;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--darker);
+            color: var(--primary);
+            padding: 1.2rem;
+            border: 1px solid var(--primary);
+            box-shadow: var(--glow);
+            border-radius: 5px;
+            transform: translateX(150%);
+            transition: transform 0.3s ease;
+            z-index: 1001;
+            max-width: 300px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification i {
+            font-size: 1.2rem;
+            color: var(--secondary);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+            
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+            
+            .hero p {
+                font-size: 1.1rem;
+            }
+            
+            .cart-modal {
+                max-width: 100%;
+            }
+            
+            .logo {
+                font-size: 1.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero {
+                padding: 2rem 1rem;
+            }
+            
+            .hero h1 {
+                font-size: 1.8rem;
+            }
+            
+            .section-title {
+                font-size: 1.6rem;
+            }
+            
+            .product-card {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Matrix rain background -->
+    <canvas id="matrix" class="matrix-rain"></canvas>
+
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <div class="logo">ROYAL-KNOTS</div>
+            <div class="cart-icon" id="cart-icon">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="cart-count" id="cart-count">0</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main content -->
+    <main>
+        <section class="hero">
+            <h1><span class="hacker-text" data-text="WELCOME">WELCOME</span></h1>
+            <p>Welcome to Royal Knots, where creativity meets elegance! We're thrilled to have you join our community of crochet enthusiasts and supporters. At Royal Knots, we're passionate about crafting beautiful, unique, and functional pieces that bring joy to those who wear or use them.          Our mission is to provide high-quality, handmade crochet items that exceed your expectations. From intricate lace shawls to cozy hats and scarves, every stitch is carefully crafted with love and attention to detail.                   We're honored to have you as part of our journey and look forward to serving you with the best crochet creations. Let's get hooked on crochet together!</p>
+        </section>
+
+        <section class="products">
+            <h2 class="section-title">// OUR SERVICES</h2>
+            <div class="products-grid" id="products-grid">
+                <!-- Products will be added dynamically with JavaScript -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Cart modal -->
+    <div class="cart-modal" id="cart-modal">
+        <div class="cart-header">
+            <h2 class="cart-title">YOUR_CART</h2>
+            <button class="close-cart" id="close-cart">&times;</button>
+        </div>
+        <div class="cart-items" id="cart-items">
+            <!-- Cart items will be added dynamically -->
+            <div class="empty-cart">NO_ITEMS_SELECTED</div>
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span class="total-label">ᴛᴏᴛᴀʟ:</span>
+                <span class="total-amount" id="cart-total">₦0.00</span>
+            </div>
+            <button class="checkout-btn" id="checkout-btn">CONFIRM ORDER</button>
+        </div>
+    </div>
+
+    <!-- Overlay -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Notification -->
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i>
+        <span id="notification-message">ITEMS ADDED TO CART!</span>
+    </div>
+
+    <!-- Binary decorations -->
+    <div class="binary-decoration" style="top: 10%; left: 5%;">01001000 01100001 01100011 01101011</div>
+    <div class="binary-decoration" style="top: 30%; right: 10%;">01010100 01101000 01100101 00100000 01001110 01100101 01110100</div>
+    <div class="binary-decoration" style="bottom: 20%; left: 15%;">01010011 01100101 01100011 01110101 01110010 01101001 01110100 01111001</div>
+    <div class="binary-decoration" style="top: 60%; right: 20%;">01000011 01111010 01100010 01100101 01110010 01110000 01110101 01101110 01101011</div>
+
+    <script>
+        // Matrix rain effect
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const katakana = 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッン';
+        const latin = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        const nums = '0123456789';
+        const symbols = '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~';
+
+        const alphabet = katakana + latin + nums + symbols;
+
+        const fontSize = 16;
+        const columns = canvas.width / fontSize;
+
+        const rainDrops = [];
+
+        for (let x = 0; x < columns; x++) {
+            rainDrops[x] = Math.random() * -100;
+        }
+
+        const draw = () => {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = '#0f0';
+            ctx.font = fontSize + 'px monospace';
+
+            for (let i = 0; i < rainDrops.length; i++) {
+                const text = alphabet.charAt(Math.floor(Math.random() * alphabet.length));
+                ctx.fillText(text, i * fontSize, rainDrops[i] * fontSize);
+                
+                if (rainDrops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    rainDrops[i] = 0;
+                }
+                rainDrops[i]++;
+            }
+        };
+
+        setInterval(draw, 30);
+
+        // Product data - updated with your products
+        const products = [
+            {
+                id: 1,
+                title: "PINK AND FULL BEANIE CAP",
+                description: "perfect pink and white all in beanie cap for a perfect teen girl",
+                price: 5000,
+                image: "https://files.catbox.moe/d4v4dy.jpeg"
+            },
+            {
+                id: 2,
+                title: "Blue-black beanie cap fits",
+                description: "Are you tired of wearing over size cap without class well this is perfect one size fits all.",
+                price: 3000,
+                image: "https://files.catbox.moe/qkq78e.jpeg"
+            },
+            {
+                id: 3,
+                title: "More available",
+                description: "MORE CAPS AVAILABLE A CHEAP AND AFFORDABLE PRICE..GET YOURS NOW!!!",
+                price: 1000,
+                image: "https://files.catbox.moe/z47m9r.jpeg"
+            },
+            {
+                id: 4,
+                title: "𝘚𝘖𝘊𝘐𝘈𝘓 𝘔𝘌𝘋𝘐𝘈 𝘏𝘈𝘊𝘒𝘚",
+                description: "ALL SOCIA MEDIA HACKS AVAILABLE HERE!!!",
+                price: 3000,
+                image: "https://i.postimg.cc/3NV8c7Q2/IMG-9119.jpg"
+            },
+            {
+                id: 5,
+                title: "𝘞𝘏𝘈𝘛𝘚𝘈𝘗𝘗 𝘚𝘗𝘠 𝘈𝘗𝘗",
+                description: "WANT TO GO THROUGH YOUR FRIENDS CHATS?….GET YOHR WHATSAPP SPY APP NOW!",
+                price: 3000,
+                image: "https://i.postimg.cc/2S4k2PcB/IMG-9120.jpg"
+            },
+            {
+                id: 6,
+                title: "𝘏𝘐𝘎𝘏 𝘘𝘜𝘈𝘓𝘐𝘛𝘠 𝘝𝘗𝘚",
+                description: "VPS CAN BE USED  TO CREATE UNLIMITED ADMIN PANELS AND OTHER PANELS…IT COMES WITH DIFFERENT CUSTOM GB…THE HIGHER THE GB, THE MORE PANELS YOU CAN CREATE WITHOUT THE PANELS LAGGING.",
+                price: 12000,
+                image: "https://i.postimg.cc/mkdF7zgF/IMG-9116.jpg"
+            },
+            {
+                id: 7,
+                title: "𝘞𝘏𝘈𝘛𝘚𝘈𝘗𝘗 𝘉𝘈𝘕 𝘈𝘕𝘋 𝘜𝘕𝘉𝘈𝘕",
+                description: "SAMMIE CAN BAN AND UNBAN BOTH PERMANENTLY AND TEMPORARILY…JUST TEXT ME WITH YOUR MONEY AND YOUR VICTIM NUMBER.",
+                price: 20000,
+                image: "https://i.postimg.cc/tJZyPfnJ/IMG-9121.jpg"
+            },
+            {
+                id: 8,
+                title: "𝘉𝘖𝘛 𝘋𝘌𝘗𝘓𝘖𝘠𝘔𝘌𝘕𝘛",
+                description: "WHATSAPP BOTS AVAILABLE HERE…BOTH MD BOT WHICH AIDS WHATSAPP ACTIVITIES AND BUG BOT WHICH CRASHES WHATSAPP",
+                price: 1500,
+                image: "https://i.postimg.cc/rpfLHcSz/IMG-9122.jpg"
+            },
+            {
+                id: 9,
+                title: "𝘊𝘖𝘋𝘐𝘕𝘎 𝘛𝘜𝘛𝘖𝘙𝘐𝘈𝘓",
+                description: "ᴛᴏ ɢᴏᴅ ʙᴇ ᴛʜᴇ ɢʟᴏʀʏ ᴡɪᴛʜ ᴛʜᴇ ᴋɴᴏᴡʟᴇᴅɢᴇ ᴏғ ᴄᴏᴅɪɴɢ  ʙᴇsᴛᴏɴᴇᴅ ᴜᴘᴏɴ ᴍᴇ...ᴡɪᴛʜ ᴊᴜsᴛ 𝟷𝟹,𝟶𝟶𝟶 ɴᴀɪʀᴀ ᴏɴʟʏ, ɪ ᴀᴍ ɢᴏɪɴɢ ᴛᴏ ᴛᴇᴀᴄʜ ʏᴏᴜ ʜᴏᴡ ᴛᴏ ᴄᴀɴ ʙᴇ ᴀ ᴄᴇʀᴛɪғɪᴇᴅ ᴘʀᴏɢʀᴀᴍᴍᴇʀ ʟɪᴋᴇ ᴍᴇ ᴀɴᴅ ᴄʀᴇᴀᴛᴇ ᴡʜᴀᴛsᴀᴘᴘ ʙᴏᴛs, ᴡᴇʙsɪᴛᴇs, ᴀᴘᴘs, ᴇᴛᴄ... ᴏɴ ʏᴏᴜʀ ᴏᴡɴ",
+                price: 13000,
+                image: "https://i.postimg.cc/nhhDV1TY/IMG-9112.jpg"
+            },
+            {
+                id: 10,
+                title: "TOOLS AVAILABILITY",
+                description: "want to buy crotcheting equipments and more.",
+                price: 2000,
+                image: "https://files.catbox.moe/o8yopj.jpeg"
+            },
+            {
+                id: 10,
+                title: "𝘞𝘌𝘉𝘚𝘐𝘛𝘌 𝘋𝘌𝘝𝘌𝘓𝘖𝘗𝘔𝘌𝘕𝘛",
+                description: "WANT TO CREATE A WEBSITE LIKE THIS OR WITH A DIFFERENT PATTERN?…DM ME WITH A SAMPLE AND WITH YOUR CASHH.",
+                price: 10000,
+                image: "https://i.postimg.cc/QM83SVKR/IMG-9123.jpg"
+            }
+            
+        ];
+
+        // Cart functionality
+        let cart = [];
+
+        // DOM elements
+        const productsGrid = document.getElementById('products-grid');
+        const cartIcon = document.getElementById('cart-icon');
+        const cartCount = document.getElementById('cart-count');
+        const cartModal = document.getElementById('cart-modal');
+        const closeCart = document.getElementById('close-cart');
+        const overlay = document.getElementById('overlay');
+        const cartItems = document.getElementById('cart-items');
+        const cartTotal = document.getElementById('cart-total');
+        const checkoutBtn = document.getElementById('checkout-btn');
+        const notification = document.getElementById('notification');
+        const notificationMessage = document.getElementById('notification-message');
+
+        // Render products
+        function renderProducts() {
+            productsGrid.innerHTML = '';
+            products.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                productCard.innerHTML = `
+                    <div class="product-image-container">
+                        <img src="${product.image}" alt="${product.title}" class="product-image">
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-title">${product.title}</h3>
+                        <p class="product-description">${product.description}</p>
+                        <div class="product-price">${product.price.toLocaleString()}</div>
+                        <div class="product-actions">
+                            <div class="quantity-controls">
+                                <button class="quantity-btn minus" data-id="${product.id}">-</button>
+                                <input type="number" class="quantity" value="1" min="1" data-id="${product.id}">
+                                <button class="quantity-btn plus" data-id="${product.id}">+</button>
+                            </div>
+                            <button class="add-to-cart" data-id="${product.id}">ADD TO CART</button>
+                        </div>
+                    </div>
+                `;
+                productsGrid.appendChild(productCard);
+            });
+
+            // Add event listeners for quantity controls
+            document.querySelectorAll('.quantity-btn.minus').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = parseInt(e.target.getAttribute('data-id'));
+                    const input = document.querySelector(`.quantity[data-id="${id}"]`);
+                    if (input.value > 1) {
+                        input.value--;
+                    }
+                });
+            });
+
+            document.querySelectorAll('.quantity-btn.plus').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = parseInt(e.target.getAttribute('data-id'));
+                    const input = document.querySelector(`.quantity[data-id="${id}"]`);
+                    input.value++;
+                });
+            });
+
+            // Add event listeners for add to cart buttons
+            document.querySelectorAll('.add-to-cart').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = parseInt(e.target.getAttribute('data-id'));
+                    const product = products.find(p => p.id === id);
+                    const quantity = parseInt(document.querySelector(`.quantity[data-id="${id}"]`).value);
+                    
+                    addToCart(product, quantity);
+                    showNotification(`${product.title} added to cart`);
+                });
+            });
+        }
+
+        // Add to cart
+        function addToCart(product, quantity) {
+            const existingItem = cart.find(item => item.id === product.id);
+            
+            if (existingItem) {
+                existingItem.quantity += quantity;
+            } else {
+                cart.push({
+                    id: product.id,
+                    title: product.title,
+                    price: product.price,
+                    quantity: quantity,
+                    image: product.image
+                });
+            }
+            
+            updateCart();
+        }
+
+        // Remove from cart
+        function removeFromCart(id) {
+            cart = cart.filter(item => item.id !== id);
+            updateCart();
+            showNotification("Item removed from cart");
+        }
+
+        // Update cart
+        function updateCart() {
+            // Update cart count
+            const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
+            cartCount.textContent = totalItems;
+            
+            // Update cart items
+            if (cart.length === 0) {
+                cartItems.innerHTML = '<div class="empty-cart">NO_ITEMS_DETECTED</div>';
+            } else {
+                cartItems.innerHTML = '';
+                cart.forEach(item => {
+                    const cartItem = document.createElement('div');
+                    cartItem.className = 'cart-item';
+                    cartItem.innerHTML = `
+                        <img src="${item.image}" alt="${item.title}" class="cart-item-image">
+                        <div class="cart-item-details">
+                            <h3 class="cart-item-title">${item.title}</h3>
+                            <div class="cart-item-price">${item.price.toLocaleString()}</div>
+                            <div class="cart-item-quantity">
+                                <span>QTY: ${item.quantity}</span>
+                            </div>
+                            <button class="remove-item" data-id="${item.id}">
+                                <i class="fas fa-trash-alt"></i> REMOVE
+                            </button>
+                        </div>
+                    `;
+                    cartItems.appendChild(cartItem);
+                });
+                
+                // Add event listeners for remove buttons
+                document.querySelectorAll('.remove-item').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const id = parseInt(e.target.getAttribute('data-id'));
+                        removeFromCart(id);
+                    });
+                });
+            }
+            
+            // Update cart total
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            cartTotal.textContent = `₦${total.toLocaleString()}`;
+        }
+
+        // Show notification
+        function showNotification(message) {
+            notificationMessage.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Initialize WhatsApp checkout
+        function initWhatsAppCheckout() {
+            // Replace this number with your actual WhatsApp number
+            const whatsappNumber = "2349064641270"; // CHANGE THIS TO YOUR NUMBER
+            
+            if (cart.length === 0) {
+                showNotification("YOUR CART IS EMPTY…PLACE AN ORDER");
+                return;
+            }
+            
+            let message = `▓▒░⫸⫷ ROYAL KNOTS ⫸⫷░▒▓\n`;
+message += `⚡HELLO ROYAL KNOTS, I WANT TO PURCHASE THE FOLLOWING ITEMS:⚡\n\n`;
+            
+cart.forEach(item => {
+    message += `⌖ ${item.title} ⎯ (Qty: ${item.quantity}) ⎯ ₦${(item.price * item.quantity).toLocaleString()}\n`;
+});
+            
+message += `\n⌯⌯⌯⌯⌯⌯⌯⌯⌯⌯⌯⌯⌯⌯⌯⌯⌯⌯⌯⌯⌯⌯⌯⌯⌯⌯⌯⌯⌯⌯\n`;
+message += `⌗ Total: ₦${cart.reduce((sum, item) => sum + (item.price * item.quantity), 0).toLocaleString()}\n`;
+message += `⌯⌯⌯⌯⌯⌯⌯⌯⌯⌯⌯⌯⌯⌯⌯⌯⌯⌯⌯⌯⌯⌯⌯⌯⌯⌯⌯⌯⌯⌯\n\n`;
+message += `◈ PLEASE PROVIDE YOUR ACCOUNT DETAILS TO MAKE PAYMENTS ◈\n`;
+message += `▓▒░⫸⫷ I WILL GET BACK TO YOU SOON ⫸⫷░▒▓`;
+            
+            const encodedMessage = encodeURIComponent(message);
+            const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+            
+            window.open(whatsappUrl, '_blank');
+        }
+
+        // Event listeners
+        cartIcon.addEventListener('click', () => {
+            cartModal.classList.add('open');
+            overlay.classList.add('active');
+        });
+
+        closeCart.addEventListener('click', () => {
+            cartModal.classList.remove('open');
+            overlay.classList.remove('active');
+        });
+
+        overlay.addEventListener('click', () => {
+            cartModal.classList.remove('open');
+            overlay.classList.remove('active');
+        });
+
+        checkoutBtn.addEventListener('click', initWhatsAppCheckout);
+
+        // Initialize the app
+        renderProducts();
+
+        // Responsive adjustments
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+</body>
+</html>
