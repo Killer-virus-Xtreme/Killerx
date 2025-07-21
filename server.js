@@ -6,7 +6,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// 🔴 Dummy in-memory database (resets on server restart)
+// 🔴 In-memory database
 const users = [];
 let resetCodes = {};
 
@@ -35,23 +35,29 @@ app.post('/api/login', (req, res) => {
   }
 });
 
-// ✅ Send reset code
-app.post('/api/send-reset-code', async (req, res) => {
+// ✅ Send reset code route
+app.post('/api/send-reset-code', (req, res) => {
   const { email } = req.body;
+
+  const user = users.find(u => u.email === email);
+  if (!user) {
+    return res.status(404).json({ message: 'Email not found' });
+  }
+
   const code = Math.floor(100000 + Math.random() * 900000).toString();
   resetCodes[email] = code;
 
-  // 🔴 Replace with your Gmail + App Password
+  // ✅ Nodemailer transporter
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: 'your@gmail.com',
-      pass: 'your_app_password' // Use Gmail App Password here
+      user: 'kin37776@gmail.com',
+      pass: 'Abby123$'
     }
   });
 
   const mailOptions = {
-    from: 'your@gmail.com',
+    from: 'kin37776@gmail.com',
     to: email,
     subject: 'Password Reset Code',
     text: `Your password reset code is ${code}`
@@ -68,16 +74,19 @@ app.post('/api/send-reset-code', async (req, res) => {
   });
 });
 
-// ✅ Reset password
+// ✅ Reset password route
 app.post('/api/reset-password', (req, res) => {
   const { email, code, newPassword } = req.body;
 
   if (resetCodes[email] && resetCodes[email] === code) {
     const user = users.find(u => u.email === email);
-    if (user) user.password = newPassword;
-
-    delete resetCodes[email];
-    res.json({ message: 'Password reset successful' });
+    if (user) {
+      user.password = newPassword;
+      delete resetCodes[email];
+      return res.json({ message: 'Password reset successful' });
+    } else {
+      return res.status(404).json({ message: 'User not found' });
+    }
   } else {
     res.status(400).json({ message: 'Invalid code' });
   }
@@ -95,4 +104,4 @@ app.get('/', (req, res) => {
 
 // ✅ Start server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
