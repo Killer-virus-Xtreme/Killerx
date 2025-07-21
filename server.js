@@ -1,18 +1,19 @@
 const express = require('express');
 const cors = require('cors');
+const nodemailer = require('nodemailer');
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-// Dummy in-memory database
+// 🔴 Dummy in-memory database (resets on server restart)
 const users = [];
+let resetCodes = {};
 
-// Signup route
+// ✅ Signup route
 app.post('/api/signup', (req, res) => {
   const { username, email, password } = req.body;
 
-  // Check if email already exists
   if (users.find(u => u.email === email)) {
     return res.status(400).json({ message: 'Email already registered' });
   }
@@ -22,7 +23,7 @@ app.post('/api/signup', (req, res) => {
   res.json({ message: 'Signup successful', user: newUser });
 });
 
-// Login route
+// ✅ Login route
 app.post('/api/login', (req, res) => {
   const { email, password } = req.body;
 
@@ -33,11 +34,6 @@ app.post('/api/login', (req, res) => {
     res.status(400).json({ message: 'Invalid email or password' });
   }
 });
-// npm install nodemailer if not yet installed
-const nodemailer = require('nodemailer');
-
-// Mock DB
-let resetCodes = {};
 
 // ✅ Send reset code
 app.post('/api/send-reset-code', async (req, res) => {
@@ -45,12 +41,12 @@ app.post('/api/send-reset-code', async (req, res) => {
   const code = Math.floor(100000 + Math.random() * 900000).toString();
   resetCodes[email] = code;
 
-  // Send email with nodemailer
+  // 🔴 Replace with your Gmail + App Password
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
       user: 'your@gmail.com',
-      pass: 'yourpassword'
+      pass: 'your_app_password' // Use Gmail App Password here
     }
   });
 
@@ -75,24 +71,28 @@ app.post('/api/send-reset-code', async (req, res) => {
 // ✅ Reset password
 app.post('/api/reset-password', (req, res) => {
   const { email, code, newPassword } = req.body;
+
   if (resetCodes[email] && resetCodes[email] === code) {
-    // Update password in DB logic here
+    const user = users.find(u => u.email === email);
+    if (user) user.password = newPassword;
+
     delete resetCodes[email];
     res.json({ message: 'Password reset successful' });
   } else {
     res.status(400).json({ message: 'Invalid code' });
   }
 });
-// Users route
+
+// ✅ Get all users route
 app.get('/api/users', (req, res) => {
   res.json({ count: users.length, users });
 });
 
-// Root route
+// ✅ Root route
 app.get('/', (req, res) => {
   res.send('Dating App API is running');
 });
 
-// Start server
+// ✅ Start server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`))
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
