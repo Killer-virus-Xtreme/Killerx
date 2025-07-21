@@ -23,6 +23,8 @@ const saveUsers = () => fs.writeFileSync(usersFile, JSON.stringify(users, null, 
 const savePosts = () => fs.writeFileSync(postsFile, JSON.stringify(posts, null, 2));
 const saveChats = () => fs.writeFileSync(chatsFile, JSON.stringify(chats, null, 2));
 
+// ====================== AUTH ROUTES ========================
+
 // Signup
 app.post('/api/signup', async (req, res) => {
   const { username, email, password, phone } = req.body;
@@ -93,6 +95,8 @@ app.post('/api/reset-password', async (req, res) => {
   res.status(400).json({ message: 'Invalid code or user not found' });
 });
 
+// ====================== FOLLOW / UNFOLLOW ========================
+
 // Follow user
 app.post('/api/follow', (req, res) => {
   const { followerId, followeeId } = req.body;
@@ -121,44 +125,73 @@ app.post('/api/unfollow', (req, res) => {
   res.json({ message: 'Unfollowed successfully' });
 });
 
-// Search users/posts
+// ====================== SEARCH ========================
+
 app.get('/api/search', (req, res) => {
   const { query } = req.query;
-  const userResults = users.filter(u => u.username.includes(query) || u.email.includes(query));
-  const postResults = posts.filter(p => p.caption.includes(query));
+  const userResults = users.filter(u => u.username.toLowerCase().includes(query.toLowerCase()) || u.email.toLowerCase().includes(query.toLowerCase()));
+  const postResults = posts.filter(p => p.caption.toLowerCase().includes(query.toLowerCase()));
   res.json({ users: userResults, posts: postResults });
 });
 
-// Create post
-app.post('/api/posts', (req, res) => {
-  const { userId, caption, image } = req.body;
-  const post = { id: Date.now(), userId, caption, image, likes: [], comments: [], created_at: new Date() };
-  posts.push(post);
-  savePosts();
-  res.json({ message: 'Post created', post });
-});
+// ====================== POSTS ========================
 
-// View posts
+// Get all posts
 app.get('/api/posts', (req, res) => {
   res.json(posts);
 });
 
+// Create post (image or video + caption)
+app.post('/api/posts', (req, res) => {
+  const { userId, media, caption } = req.body;
+  const user = users.find(u => u.id === userId);
+  if (!user) return res.status(404).json({ message: 'User not found' });
+
+  const newPost = {
+    id: Date.now(),
+    userId,
+    username: user.username,
+    media, // URL of image or video
+    caption,
+    likes: [],
+    comments: [],
+    created_at: new Date()
+  };
+  posts.unshift(newPost);
+  savePosts();
+  res.json({ message: 'Post created', post: newPost });
+});
+
 // Like post
-app.post('/api/posts/like', (req, res) => {
-  const { postId, userId } = req.body;
-  const post = posts.find(p => p.id === postId);
+app.post('/api/posts/:id/like', (req, res) => {
+  const { id } = req.params;
+  const { userId } = req.body;
+  const post = posts.find(p => p.id == id);
+  if (!post) return res.status(404).json({ message: 'Post not found' });
+
   if (!post.likes.includes(userId)) post.likes.push(userId);
   savePosts();
-  res.json({ message: 'Post liked' });
+  res.json({ message: 'Post liked', likes: post.likes.length });
 });
 
 // Comment on post
-app.post('/api/posts/comment', (req, res) => {
-  const { postId, userId, comment } = req.body;
-  const post = posts.find(p => p.id === postId);
-  post.comments.push({ userId, comment, created_at: new Date() });
+app.post('/api/posts/:id/comment', (req, res) => {
+  const { id } = req.params;
+  const { userId, comment } = req.body;
+  const post = posts.find(p => p.id == id);
+  const user = users.find(u => u.id === userId);
+  if (!post) return res.status(404).json({ message: 'Post not found' });
+  if (!user) return res.status(404).json({ message: 'User not found' });
+
+  post.comments.push({
+    id: Date.now(),
+    userId,
+    username: user.username,
+    comment,
+    created_at: new Date()
+  });
   savePosts();
-  res.json({ message: 'Comment added' });
+  res.json({ message: 'Comment added', comments: post.comments });
 });
 
 // Delete post
@@ -169,7 +202,9 @@ app.delete('/api/posts/:id', (req, res) => {
   res.json({ message: 'Post deleted' });
 });
 
-// Basic chats
+// ====================== CHATS ========================
+
+// Send message
 app.post('/api/chats', (req, res) => {
   const { fromId, toId, message } = req.body;
   const chat = { id: Date.now(), fromId, toId, message, created_at: new Date() };
@@ -178,22 +213,26 @@ app.post('/api/chats', (req, res) => {
   res.json({ message: 'Message sent', chat });
 });
 
+// Get chats for user
 app.get('/api/chats', (req, res) => {
   const { userId } = req.query;
   const userChats = chats.filter(c => c.fromId === parseInt(userId) || c.toId === parseInt(userId));
   res.json(userChats);
 });
 
-// Users route
+// ====================== USERS ========================
+
 app.get('/api/users', (req, res) => {
   res.json({ count: users.length, users });
 });
 
-// Root route
+// ====================== ROOT ========================
+
 app.get('/', (req, res) => {
   res.send('Dating App API is running');
 });
 
-// Start server
+// ====================== START SERVER ========================
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
