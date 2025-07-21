@@ -7,11 +7,10 @@
     "start": "node server.js"
   },
   "dependencies": {
-    "express": "^5.0.0",
-    "mongoose": "^7.3.1",
+    "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
-    "nodemailer": "^6.9.4",
-    "body-parser": "^1.20.2"
+    "express": "^4.18.2",
+    "nodemailer": "^6.9.4"
   },
   "engines": {
     "node": ">=14.0.0"
