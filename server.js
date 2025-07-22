@@ -25,7 +25,6 @@ const saveChats = () => fs.writeFileSync(chatsFile, JSON.stringify(chats, null, 
 
 // ====================== AUTH ROUTES ========================
 
-// Signup
 app.post('/api/signup', async (req, res) => {
   const { username, email, password, phone } = req.body;
   if (users.find(u => u.email === email)) return res.status(400).json({ message: 'Email already registered' });
@@ -36,7 +35,6 @@ app.post('/api/signup', async (req, res) => {
   res.json({ message: 'Signup successful', user: newUser });
 });
 
-// Login
 app.post('/api/login', async (req, res) => {
   const { email, password } = req.body;
   const user = users.find(u => u.email === email);
@@ -47,7 +45,28 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-// Forget password - send reset code
+// ====================== PROFILE ROUTE ========================
+
+app.get('/api/profile/:id', (req, res) => {
+  const userId = parseInt(req.params.id);
+  const user = users.find(u => u.id === userId);
+  if (!user) return res.status(404).json({ message: 'User not found' });
+
+  const userPosts = posts.filter(p => p.userId === userId);
+  res.json({
+    id: user.id,
+    username: user.username,
+    email: user.email,
+    phone: user.phone,
+    followers: user.followers.length,
+    following: user.following.length,
+    created_at: user.created_at,
+    posts: userPosts
+  });
+});
+
+// ====================== PASSWORD RESET ========================
+
 let resetCodes = {};
 app.post('/api/send-reset-code', async (req, res) => {
   const { email } = req.body;
@@ -80,7 +99,6 @@ app.post('/api/send-reset-code', async (req, res) => {
   });
 });
 
-// Reset password
 app.post('/api/reset-password', async (req, res) => {
   const { email, code, newPassword } = req.body;
   if (resetCodes[email] && resetCodes[email] === code) {
@@ -95,9 +113,8 @@ app.post('/api/reset-password', async (req, res) => {
   res.status(400).json({ message: 'Invalid code or user not found' });
 });
 
-// ====================== FOLLOW / UNFOLLOW ========================
+// ====================== FOLLOW ========================
 
-// Follow user
 app.post('/api/follow', (req, res) => {
   const { followerId, followeeId } = req.body;
   const follower = users.find(u => u.id === followerId);
@@ -111,7 +128,6 @@ app.post('/api/follow', (req, res) => {
   res.json({ message: 'Followed successfully' });
 });
 
-// Unfollow user
 app.post('/api/unfollow', (req, res) => {
   const { followerId, followeeId } = req.body;
   const follower = users.find(u => u.id === followerId);
@@ -136,12 +152,10 @@ app.get('/api/search', (req, res) => {
 
 // ====================== POSTS ========================
 
-// Get all posts
 app.get('/api/posts', (req, res) => {
   res.json(posts);
 });
 
-// Create post (image or video + caption)
 app.post('/api/posts', (req, res) => {
   const { userId, media, caption } = req.body;
   const user = users.find(u => u.id === userId);
@@ -162,7 +176,6 @@ app.post('/api/posts', (req, res) => {
   res.json({ message: 'Post created', post: newPost });
 });
 
-// Like post
 app.post('/api/posts/:id/like', (req, res) => {
   const { id } = req.params;
   const { userId } = req.body;
@@ -174,7 +187,6 @@ app.post('/api/posts/:id/like', (req, res) => {
   res.json({ message: 'Post liked', likes: post.likes.length });
 });
 
-// Comment on post
 app.post('/api/posts/:id/comment', (req, res) => {
   const { id } = req.params;
   const { userId, comment } = req.body;
@@ -194,7 +206,6 @@ app.post('/api/posts/:id/comment', (req, res) => {
   res.json({ message: 'Comment added', comments: post.comments });
 });
 
-// Delete post
 app.delete('/api/posts/:id', (req, res) => {
   const postId = parseInt(req.params.id);
   posts = posts.filter(p => p.id !== postId);
@@ -204,7 +215,6 @@ app.delete('/api/posts/:id', (req, res) => {
 
 // ====================== CHATS ========================
 
-// Send message
 app.post('/api/chats', (req, res) => {
   const { fromId, toId, message } = req.body;
   const chat = { id: Date.now(), fromId, toId, message, created_at: new Date() };
@@ -213,17 +223,10 @@ app.post('/api/chats', (req, res) => {
   res.json({ message: 'Message sent', chat });
 });
 
-// Get chats for user
 app.get('/api/chats', (req, res) => {
   const { userId } = req.query;
   const userChats = chats.filter(c => c.fromId === parseInt(userId) || c.toId === parseInt(userId));
   res.json(userChats);
-});
-
-// ====================== USERS ========================
-
-app.get('/api/users', (req, res) => {
-  res.json({ count: users.length, users });
 });
 
 // ====================== ROOT ========================
