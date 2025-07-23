@@ -1,73 +1,38 @@
 const express = require('express');
 const cors = require('cors');
-const bcrypt = require('bcryptjs');
-const fs = require('fs');
 const nodemailer = require('nodemailer');
-
 const app = express();
+
 app.use(cors());
 app.use(express.json());
 
-// Data files
-const usersFile = './users.json';
-const postsFile = './posts.json';
-const chatsFile = './chats.json';
+// Dummy in-memory database
+const users = [];
+let resetCodes = {};
 
-// Load data or initialize
-let users = fs.existsSync(usersFile) ? JSON.parse(fs.readFileSync(usersFile)) : [];
-let posts = fs.existsSync(postsFile) ? JSON.parse(fs.readFileSync(postsFile)) : [];
-let chats = fs.existsSync(chatsFile) ? JSON.parse(fs.readFileSync(chatsFile)) : [];
-
-// Save functions
-const saveUsers = () => fs.writeFileSync(usersFile, JSON.stringify(users, null, 2));
-const savePosts = () => fs.writeFileSync(postsFile, JSON.stringify(posts, null, 2));
-const saveChats = () => fs.writeFileSync(chatsFile, JSON.stringify(chats, null, 2));
-
-// ====================== AUTH ROUTES ========================
-
-app.post('/api/signup', async (req, res) => {
-  const { username, email, password, phone } = req.body;
-  if (users.find(u => u.email === email)) return res.status(400).json({ message: 'Email already registered' });
-  const hashedPassword = await bcrypt.hash(password, 10);
-  const newUser = { id: Date.now(), username, email, phone, password: hashedPassword, followers: [], following: [], created_at: new Date() };
+// 🔑 Signup
+app.post('/api/signup', (req, res) => {
+  const { username, email, password } = req.body;
+  if (users.find(u => u.email === email)) {
+    return res.status(400).json({ message: 'Email already registered' });
+  }
+  const newUser = { id: Date.now(), username, email, password, created_at: new Date() };
   users.push(newUser);
-  saveUsers();
   res.json({ message: 'Signup successful', user: newUser });
 });
 
-app.post('/api/login', async (req, res) => {
+// 🔑 Login
+app.post('/api/login', (req, res) => {
   const { email, password } = req.body;
-  const user = users.find(u => u.email === email);
-  if (user && await bcrypt.compare(password, user.password)) {
+  const user = users.find(u => u.email === email && u.password === password);
+  if (user) {
     res.json({ message: 'Login successful', user });
   } else {
     res.status(400).json({ message: 'Invalid email or password' });
   }
 });
 
-// ====================== PROFILE ROUTE ========================
-
-app.get('/api/profile/:id', (req, res) => {
-  const userId = parseInt(req.params.id);
-  const user = users.find(u => u.id === userId);
-  if (!user) return res.status(404).json({ message: 'User not found' });
-
-  const userPosts = posts.filter(p => p.userId === userId);
-  res.json({
-    id: user.id,
-    username: user.username,
-    email: user.email,
-    phone: user.phone,
-    followers: user.followers.length,
-    following: user.following.length,
-    created_at: user.created_at,
-    posts: userPosts
-  });
-});
-
-// ====================== PASSWORD RESET ========================
-
-let resetCodes = {};
+// 🔑 Send reset code
 app.post('/api/send-reset-code', async (req, res) => {
   const { email } = req.body;
   const code = Math.floor(100000 + Math.random() * 900000).toString();
@@ -76,13 +41,13 @@ app.post('/api/send-reset-code', async (req, res) => {
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: 'kin37776@gmail.com',
-      pass: 'Abby123$'
+      user: 'your@gmail.com',
+      pass: 'yourpassword'
     }
   });
 
   const mailOptions = {
-    from: 'kin37776@gmail.com',
+    from: 'your@gmail.com',
     to: email,
     subject: 'Password Reset Code',
     text: `Your password reset code is ${code}`
@@ -99,13 +64,13 @@ app.post('/api/send-reset-code', async (req, res) => {
   });
 });
 
-app.post('/api/reset-password', async (req, res) => {
+// 🔑 Reset password
+app.post('/api/reset-password', (req, res) => {
   const { email, code, newPassword } = req.body;
   if (resetCodes[email] && resetCodes[email] === code) {
     const user = users.find(u => u.email === email);
     if (user) {
-      user.password = await bcrypt.hash(newPassword, 10);
-      saveUsers();
+      user.password = newPassword;
       delete resetCodes[email];
       return res.json({ message: 'Password reset successful' });
     }
@@ -113,129 +78,23 @@ app.post('/api/reset-password', async (req, res) => {
   res.status(400).json({ message: 'Invalid code or user not found' });
 });
 
-// ====================== FOLLOW ========================
-
-app.post('/api/follow', (req, res) => {
-  const { followerId, followeeId } = req.body;
-  const follower = users.find(u => u.id === followerId);
-  const followee = users.find(u => u.id === followeeId);
-  if (!follower || !followee) return res.status(400).json({ message: 'User not found' });
-
-  if (!follower.following.includes(followeeId)) follower.following.push(followeeId);
-  if (!followee.followers.includes(followerId)) followee.followers.push(followerId);
-
-  saveUsers();
-  res.json({ message: 'Followed successfully' });
+// 👤 Get ALL users
+app.get('/api/users', (req, res) => {
+  res.json({ count: users.length, users });
 });
 
-app.post('/api/unfollow', (req, res) => {
-  const { followerId, followeeId } = req.body;
-  const follower = users.find(u => u.id === followerId);
-  const followee = users.find(u => u.id === followeeId);
-  if (!follower || !followee) return res.status(400).json({ message: 'User not found' });
-
-  follower.following = follower.following.filter(id => id !== followeeId);
-  followee.followers = followee.followers.filter(id => id !== followerId);
-
-  saveUsers();
-  res.json({ message: 'Unfollowed successfully' });
-});
-
-// ====================== SEARCH ========================
-
-app.get('/api/search', (req, res) => {
-  const { query } = req.query;
-  const userResults = users.filter(u => u.username.toLowerCase().includes(query.toLowerCase()) || u.email.toLowerCase().includes(query.toLowerCase()));
-  const postResults = posts.filter(p => p.caption.toLowerCase().includes(query.toLowerCase()));
-  res.json({ users: userResults, posts: postResults });
-});
-
-// ====================== POSTS ========================
-
-app.get('/api/posts', (req, res) => {
-  res.json(posts);
-});
-
-app.post('/api/posts', (req, res) => {
-  const { userId, media, caption } = req.body;
-  const user = users.find(u => u.id === userId);
+// 👤 Get single user by ID (✅ Added route)
+app.get('/api/users/:id', (req, res) => {
+  const user = users.find(u => u.id == req.params.id);
   if (!user) return res.status(404).json({ message: 'User not found' });
-
-  const newPost = {
-    id: Date.now(),
-    userId,
-    username: user.username,
-    media, // URL of image or video
-    caption,
-    likes: [],
-    comments: [],
-    created_at: new Date()
-  };
-  posts.unshift(newPost);
-  savePosts();
-  res.json({ message: 'Post created', post: newPost });
+  res.json(user);
 });
 
-app.post('/api/posts/:id/like', (req, res) => {
-  const { id } = req.params;
-  const { userId } = req.body;
-  const post = posts.find(p => p.id == id);
-  if (!post) return res.status(404).json({ message: 'Post not found' });
-
-  if (!post.likes.includes(userId)) post.likes.push(userId);
-  savePosts();
-  res.json({ message: 'Post liked', likes: post.likes.length });
-});
-
-app.post('/api/posts/:id/comment', (req, res) => {
-  const { id } = req.params;
-  const { userId, comment } = req.body;
-  const post = posts.find(p => p.id == id);
-  const user = users.find(u => u.id === userId);
-  if (!post) return res.status(404).json({ message: 'Post not found' });
-  if (!user) return res.status(404).json({ message: 'User not found' });
-
-  post.comments.push({
-    id: Date.now(),
-    userId,
-    username: user.username,
-    comment,
-    created_at: new Date()
-  });
-  savePosts();
-  res.json({ message: 'Comment added', comments: post.comments });
-});
-
-app.delete('/api/posts/:id', (req, res) => {
-  const postId = parseInt(req.params.id);
-  posts = posts.filter(p => p.id !== postId);
-  savePosts();
-  res.json({ message: 'Post deleted' });
-});
-
-// ====================== CHATS ========================
-
-app.post('/api/chats', (req, res) => {
-  const { fromId, toId, message } = req.body;
-  const chat = { id: Date.now(), fromId, toId, message, created_at: new Date() };
-  chats.push(chat);
-  saveChats();
-  res.json({ message: 'Message sent', chat });
-});
-
-app.get('/api/chats', (req, res) => {
-  const { userId } = req.query;
-  const userChats = chats.filter(c => c.fromId === parseInt(userId) || c.toId === parseInt(userId));
-  res.json(userChats);
-});
-
-// ====================== ROOT ========================
-
+// 🌐 Root route
 app.get('/', (req, res) => {
-  res.send('Dating App API is running');
+  res.send('Love Connect API is running');
 });
 
-// ====================== START SERVER ========================
-
+// 🚀 Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
